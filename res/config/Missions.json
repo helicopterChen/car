@@ -1,0 +1,11 @@
+{
+"types":
+["I","S","S","I","S","B"],
+"fields":
+["id","name","type","mapId","bg","isReverse"],
+"values":
+[
+["20001","正常赛","Free","1002","png/map_bg_1002.png","FALSE"]
+,["20002","反向赛","Free","1001","png/map_bg_1003.jpg","TRUE"]
+]
+}

@@ -1,0 +1,12 @@
+{
+"types":
+["I","S","S","I","I"],
+"fields":
+["id","name","view","x","y"],
+"values":
+[
+["10001","车1","png/test_kadingche01.png","899","877"]
+,["10002","车2","png/test_kadingche02.png","1332","552"]
+,["10003","车3","png/test_kadingche03.png","1332","552"]
+]
+}

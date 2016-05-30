@@ -4,6 +4,7 @@ function UIGameMission:InitConfig()
 	self.m_sJsonFilePath = "ui/gameMission.json"
 	self.m_bTouchMode = cc.TOUCH_MODE_ALL_AT_ONCE
 	self.m_bTouchSwallowEnabled = false
+	self.m_bTouchEnabled = true
 end
 
 function UIGameMission:OnInitEventsHandler()
@@ -15,6 +16,8 @@ function UIGameMission:OnInitEventsHandler()
 	end
 	self:RegisterEventsHandlers( "ref", "TouchEvent", self.OnTouchEvent )
 	self:RegisterEventsHandlers( "ref/backBtn", 	"OnClicked", 	self.OnClickedBackBtn )
+	self:RegisterEventsHandlers( "ref/addBtn", 		"OnClicked", 	self.OnClickedAddBtn )
+	self:RegisterEventsHandlers( "ref/minusBtn", 	"OnClicked", 	self.OnClickedMinusBtn )
 end
 
 function UIGameMission:InitData()
@@ -27,6 +30,7 @@ function UIGameMission:OnCloseUI()
 end
 ---------------------------------------------------------------------------------------------------------
 function UIGameMission:OnTouchEvent( event )
+	print( "OnTouchEvent", event.name )
 	local oCurScene = _G.GAME_APP:GetCurScene()
 	if oCurScene == nil then
 		return
@@ -63,6 +67,40 @@ end
 
 function UIGameMission:OnClickedBackBtn()
 	_G.GAME_APP:EnterSceneMainGame()
+end
+
+function UIGameMission:OnClickedAddBtn()
+	local oGameApp = self:GetGameApp()
+    if oGameApp == nil then
+        return
+    end
+    local oObjectManager = oGameApp:GetObjectManager()
+    if oObjectManager == nil then
+        return
+    end
+    local tCars = oObjectManager:GetObjectsByType( "CGameCar" )
+    if tCars ~= nil then
+        for i, v in pairs( tCars ) do
+        	v:SetVelocity( 500, 0 )
+        end
+    end
+end
+
+function UIGameMission:OnClickedMinusBtn()
+	local oGameApp = self:GetGameApp()
+    if oGameApp == nil then
+        return
+    end
+    local oObjectManager = oGameApp:GetObjectManager()
+    if oObjectManager == nil then
+        return
+    end
+    local tCars = oObjectManager:GetObjectsByType( "CGameCar" )
+    if tCars ~= nil then
+        for i, v in pairs( tCars ) do
+        	v:SetVelocity( 0, 0 )
+        end
+    end
 end
 
 return UIGameMission

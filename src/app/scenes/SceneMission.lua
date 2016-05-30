@@ -1,6 +1,5 @@
 local SceneMission = class("SceneMission",  _G.GAME_BASE.cSceneBaseClass )
 
-
 local GRAVITY         = 0
 local COIN_MASS       = 100
 local COIN_RADIUS     = 46
@@ -9,9 +8,10 @@ local COIN_ELASTICITY = 0.95
 local WALL_THICKNESS  = 64
 local WALL_FRICTION   = 1.0
 local WALL_ELASTICITY = 0.5
-local _angle_r2a = 180 / 3.1415
+local _angle_r2a = 180 / math.pi
 
-function SceneMission:OnCreate()
+function SceneMission:OnCreate( nMissionId )
+    self.m_nMissionId = nMissionId
 end
 
 function SceneMission:PreLoadRes()
@@ -19,10 +19,21 @@ end
 
 function SceneMission:OnLoadOver()
     local uiManager = _G.GAME_APP:GetUIManager()
-    uiManager:ShowUI( "UIGameMission", true )
+    uiManager:ShowUI( "UIGameMission", true, nil,nil, true )
 end
 
 function SceneMission:OnEnter()
+    local oGameApp = self:GetGameApp()
+    if oGameApp == nil then
+        return
+    end
+    local oRaceLogicManager = oGameApp:GetRaceLogicManager()
+    if oRaceLogicManager == nil then
+        return
+    end
+    self.m_oRaceLogicManager = oRaceLogicManager
+    oRaceLogicManager:StartRace( self.m_nMissionId )
+    --[[
     self.myCar = nil
     local sceneRoot = self:GetSceneRoot()
     if sceneRoot == nil then
@@ -115,7 +126,7 @@ function SceneMission:OnEnter()
                     self.carObj.SpeedDownFactor = 0.4
                     self.carObj.SpeedMinFactor = 0.4
                     bodyA:setVelocity( cc.p( norVec.x * nSpeed * 0.4, norVec.y * nSpeed * 0.4) )
-                else
+                elseif angle > 0 and angle <= 105 then
                     self.carObj.SpeedDownTime = 1.0
                     self.carObj.SpeedDownFactor = 0.2
                     self.carObj.SpeedMinFactor = 0.2
@@ -157,7 +168,7 @@ function SceneMission:OnEnter()
                     self.carObj.SpeedDownFactor = 0.4
                     self.carObj.SpeedMinFactor = 0.4
                     bodyB:setVelocity( cc.p( norVec.x * nSpeed * 0.4, norVec.y * nSpeed * 0.4) )
-                else
+                elseif angle > 0 and angle <= 105 then
                     self.carObj.SpeedDownTime = 1.0
                     self.carObj.SpeedDownFactor = 0.2
                     self.carObj.SpeedMinFactor = 0.2
@@ -220,20 +231,6 @@ function SceneMission:OnEnter()
         node:setPhysicsBody(coinBody)
         node:setPosition( cc.p(0,0) )
     end
-    self.m_towers = {}
-    local tTowersInfo = tMapData.TowersInfo
-    if tTowersInfo ~= nil then
-        for i, v in ipairs(tTowersInfo) do
-            local oSprite = cc.Sprite:create( "png/model_ta_0002.png" )
-            if oSprite ~= nil then
-                self:addChild( oSprite )
-                oSprite:setScale( 0.6 )
-                oSprite:setPosition( cc.p(v.x,v.y) )
-                oSprite:setLocalZOrder( 10 )
-                table.insert( self.m_towers, { x=v.x, y=v.y } )
-            end
-        end
-    end
     local drawNode = cc.DrawNode:create()
     if drawNode ~= nil then
         oGameLayer:addChild( drawNode )
@@ -241,11 +238,12 @@ function SceneMission:OnEnter()
         self.drawNode = drawNode
     end
     self:addObj()
+    --]]
 end
 
 function SceneMission:OnExit()
-    if self.world ~= nil then
-        self.world:removeAllBodies()
+    if self.m_oRaceLogicManager ~= nil then
+        self.m_oRaceLogicManager:OnDestory()
     end
 end
 
@@ -313,18 +311,8 @@ function SceneMission:getMapInfo( nId )
                 end
             end
         end
-        local tTowersInfo = {}
-        local tInnerTrack = tmx_lookupLayer( tMapInfo, "objectgroup", "towers" )
-        if tInnerTrack ~= nil then
-            if tInnerTrack.objects ~= nil then
-                for i, v in ipairs(tInnerTrack.objects) do
-                    table.insert( tTowersInfo, { x=v.x, y=nHeight-v.y} )
-                end
-            end
-        end
         tData.OuterTracks = tOuterTracks
         tData.InnerTracks = tInnerTracks
-        tData.TowersInfo = tTowersInfo
     end
     return tData
 end
@@ -338,6 +326,10 @@ function SceneMission:Update(dt)
     if oSceneRoot == nil or oGameLayer == nil then
         return
     end
+    if self.m_oRaceLogicManager ~= nil then
+        self.m_oRaceLogicManager:Update( nTimeDelta )
+    end
+    --[[
     if self.world ~= nil then
         self.world:step(dt)
     end
@@ -380,10 +372,10 @@ function SceneMission:Update(dt)
     end
     if self.carObj ~= nil then
         self.drawNode:clear()
-        for i, v in ipairs( self.m_towers ) do
-            self.drawNode:drawSolidCircle( cc.p(v.x,v.y), 270, 360, 32, cc.c4f(1,0,1,0.1) )
-            self.drawNode:drawCircle( cc.p(v.x,v.y), 270, 360, 32, false, cc.c4f(1,0,1,0.5) )
-        end
+        --for i, v in ipairs( self.m_towers ) do
+        --    self.drawNode:drawSolidCircle( cc.p(v.x,v.y), 270, 360, 32, cc.c4f(1,0,1,0.1) )
+        --    self.drawNode:drawCircle( cc.p(v.x,v.y), 270, 360, 32, false, cc.c4f(1,0,1,0.5) )
+        --end
         if self.drawNode ~= nil then
             local oPhysicsBody = self.carObj:getPhysicsBody()
             if oPhysicsBody ~= nil then
@@ -397,13 +389,14 @@ function SceneMission:Update(dt)
                         local nAngle = math.atan2( tArror.y,tArror.x )
                         local nSpeed = -800
                         local nFactor = self.carObj.SpeedDownFactor or 1.0
-                        local x = math.cos( nAngle - _angle_r2a * 90.0025 ) * nFactor * nSpeed
-                        local y = math.sin( nAngle - _angle_r2a * 90.0025 ) * nFactor * nSpeed
+                        local x = math.cos( nAngle - _angle_r2a * 90 ) * nFactor * nSpeed
+                        local y = math.sin( nAngle - _angle_r2a * 90 ) * nFactor * nSpeed
                         local nDistance = self:getDistance( tTower, tCurPos )
-                        local ox = -math.cos( nAngle - _angle_r2a * 90.0025 ) * nFactor * 150
-                        local oy = -math.sin( nAngle - _angle_r2a * 90.0025 ) * nFactor * 150
+                        local ox = -math.cos( nAngle - _angle_r2a * 90 ) * nFactor * 150
+                        local oy = -math.sin( nAngle - _angle_r2a * 90 ) * nFactor * 150
                         self.drawNode:drawLine( cc.p( tCurPos.x-nOX, tCurPos.y -nOY), cc.p( tCurPos.x + ox-nOX, tCurPos.y + oy -nOY), cc.c4f(1,1,0,1) )
                         self.drawNode:drawSolidCircle( cc.p(tTower.x-nOX,tTower.y-nOY), nDistance, 360, 32, cc.c4f(1,1,0,0.1) )
+                        self.drawNode:drawCircle( cc.p(tTower.x-nOX,tTower.y-nOY), nDistance, 360, 32, false, cc.c4f(1,1,0,0.5) )
                         if self.screen_pressed == true and self.collisionIgnoreTime == 0 then
                             oPhysicsBody:setVelocity( cc.p( x, y ) )
                             local oSprite = self.carObj:getChildByTag(999901)
@@ -416,7 +409,23 @@ function SceneMission:Update(dt)
                 end
             end
         end
-    end        
+    end       
+    if self.drawNode ~= nil then
+        local oDataManager = _G.GAME_APP:GetDataManager()
+        local tTowersConf = oDataManager:GetDataByNameAndId( "TowersConf", 20001 )
+        if tTowersConf ~= nil then
+            for i, v in pairs( tTowersConf ) do
+                if v.type == 1 then
+                    self.drawNode:drawDebugSector( {x=v.x,y=v.y}, v.param1, v.param2, v.param3, v.param4, v.isReverse )
+                elseif v.type == 2 then
+                    self.drawNode:drawDebugRect( {x=v.x,y=v.y}, v.param1, v.param2, v.param3, v.param4, v.isReverse )
+                end
+            end
+        end
+        --self.drawNode:drawSolidSector( {x=800,y=600}, self.m_innerSize, self.m_outerSize, 250, 60, 36,cc.c4f(0,1,0,0.1) )
+        --self.drawNode:drawSector( {x=800,y=600}, self.m_innerSize, self.m_outerSize, 250, 60, 36,cc.c4f(0,1,0,0.5) )
+    end 
+    --]]
         --[[
         if self.screen_pressed == true then
             local oPhysicsBody = self.carObj:getPhysicsBody()
@@ -444,14 +453,20 @@ function SceneMission:Update(dt)
 end
 
 function SceneMission:findTower( nOX, nOY )
-    if self.carObj ~= nil then
+    local oDataManager = _G.GAME_APP:GetDataManager()
+    if self.carObj ~= nil and oDataManager ~= nil then
         local oPhysicsBody = self.carObj:getPhysicsBody()
-        if oPhysicsBody ~= nil and self.m_towers ~= nil then
+        local tTowersConf = oDataManager:GetDataByNameAndId( "TowersConf", 20001 )
+        if oPhysicsBody ~= nil and tTowersConf ~= nil then
             local tCurPos = oPhysicsBody:getPosition()
-            for i, v in ipairs( self.m_towers) do
-                local nDistance = self:getDistance( tCurPos, { x = v.x + nOX, y = v.y + nOY } )
-                if nDistance < 270 then
-                    return { x = v.x + nOX, y = v.y + nOY  }
+            for i, v in pairs( tTowersConf ) do
+                if v.type == 1 then
+                    local nDistance = self:getDistance( tCurPos, { x = v.x + nOX, y = v.y + nOY } )
+                    if nDistance >= v.param3 and nDistance <= v.param4 then
+                        local nBeginAngle = v.param1 - v.param2 / 2
+                        local nEndAngle = v.param1 + v.param2 / 2
+                        return { x = v.x + nOX, y = v.y + nOY, innerRadius = v.param3, outerRadius = v.param4 }
+                    end
                 end
             end
         end

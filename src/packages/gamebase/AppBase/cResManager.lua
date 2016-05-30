@@ -197,7 +197,7 @@ end
 
 function cResManager:ConverJsonCfgData( jsonDataFilePath, tCfgDef, funcCallback )
 	if self.m_oGameResLoader.isFake == true then
-		CfgData.loadCfgTable( tCfgDef[1] )
+		--CfgData.loadCfgTable( tCfgDef[1] )
 		self.m_tCfgDataConvertedMark[jsonDataFilePath] = true
 		if funcCallback ~= nil then
 			funcCallback()
@@ -275,7 +275,7 @@ function cResManager:StepConvertJsonCfgData( jsonDataFilePath, idx, tCfgDef, fun
 			end
 		end
 		if bIsEnd == true then
-			CfgData.initCfgTable( sCfgName, self.m_tCfgConvertedDataMap[ jsonDataFilePath ] or {} )
+			--CfgData.initCfgTable( sCfgName, self.m_tCfgConvertedDataMap[ jsonDataFilePath ] or {} )
 			self.m_tCfgDataConvertedMark[jsonDataFilePath] = true
 			funcCallback()
 		end

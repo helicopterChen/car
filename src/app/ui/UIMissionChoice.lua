@@ -6,6 +6,7 @@ end
 
 function UIMissionChoice:OnInitEventsHandler()
 	self:RegisterEventsHandlers( "ref/enterMissionBtn", 	  		"OnClicked", 	self.OnClickedEnterMissBtn )
+	self:RegisterEventsHandlers( "ref/Button_5", 	  				"OnClicked", 	self.OnClickedButton_5 )
 	self:RegisterEventsHandlers( "ref/backBtn", 	  				"OnClicked", 	self.OnClickedBackBtn  )
 end
 
@@ -22,7 +23,12 @@ function UIMissionChoice:OnUpdateUI()
 end
 
 function UIMissionChoice:OnClickedEnterMissBtn()
-	_G.GAME_APP:EnterSceneMission()
+	_G.GAME_APP:EnterSceneMission( 20001 )
+	self:Close()
+end
+
+function UIMissionChoice:OnClickedButton_5()
+	_G.GAME_APP:EnterSceneMission( 20002 )
 	self:Close()
 end
 

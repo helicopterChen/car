@@ -235,6 +235,7 @@ function UIManager:GetUIByName( uiName )
 		local uiModule = UIClass:new()
 		assert( uiModule ~= nil )
 		uiModule:SetUIManager(self)
+		uiModule:SetGameApp(self.m_oGameApp)
 		uiModule:InitConfig()
 		assert(uiModule.m_sJsonFilePath ~= nil and uiModule.m_sJsonFilePath ~= "")
 		local uiRootNode, nWidth, nHeight = self:GetUIFromFilePath( uiModule.m_sJsonFilePath )
@@ -520,7 +521,7 @@ function UIManager:DestoryAllUI()
 		end
 	end
 	for i, v in pairs( self.m_tPreCreatedUINode ) do
-		if i ~= "ui/smallLoading.json" and i ~= "ui/waitLoading.json" then
+		if i ~= "ui/smallLoading.json" and i ~= "ui/loading.json" then
 			local oRootNode = v[1]
 			if oRootNode ~= nil then
 				oRootNode:release()
@@ -549,8 +550,8 @@ function UIManager:Update( dt )
 	self.m_nTotalUpdateTime = self.m_nTotalUpdateTime + dt
 	local bUpdateSec = (math.floor( self.m_nLastUpdateTime ) < math.floor( self.m_nTotalUpdateTime ))
 	for i, v in pairs( self.m_tUIOpened ) do
-		if v.onUpdateUI ~= nil then
-			v:onUpdateUI( dt )
+		if v.OnUpdateUI ~= nil then
+			v:OnUpdateUI( dt )
 		end
 		if bUpdateSec == true and v.OnUpdateSec ~= nil then
 			v:OnUpdateSec( dt )
@@ -560,9 +561,9 @@ function UIManager:Update( dt )
 				v:OnUpdateViewData()
 			end
 		end
-		if v.onUpdateView ~= nil then
+		if v.OnUpdateView ~= nil then
 			if v.m_tUIViewData ~= nil and v.m_tUIViewData:IsDirty() == true then
-				v:onUpdateView()
+				v:OnUpdateView()
 				v.m_tUIViewData:ResetDirty()
 			end
 		end

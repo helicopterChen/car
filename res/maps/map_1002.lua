@@ -188,39 +188,6 @@ return {
           properties = {}
         }
       }
-    },
-    {
-      type = "objectgroup",
-      name = "towers",
-      visible = true,
-      opacity = 1,
-      properties = {},
-      objects = {
-        {
-          name = "tower_1",
-          type = "Tower",
-          shape = "ellipse",
-          x = 899,
-          y = 203,
-          width = 0,
-          height = 0,
-          rotation = 0,
-          visible = true,
-          properties = {}
-        },
-        {
-          name = "tower_3",
-          type = "Tower",
-          shape = "ellipse",
-          x = 1332,
-          y = 528,
-          width = 0,
-          height = 0,
-          rotation = 0,
-          visible = true,
-          properties = {}
-        }
-      }
     }
   }
 }

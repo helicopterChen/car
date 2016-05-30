@@ -1,6 +1,8 @@
 --为了保证之后游戏运行流畅,UIjson文件的解析一般都放到loading的时候进行预加载
 local CDataManager = class("CDataManager")
 local CSVLoader = import( "..CommonUtility.CSVLoader" )
+local TableUtility = import("..CommonUtility.TableUtility")
+local JsonParser = import("..CommonUtility.JsonParser")
 
 function CDataManager:ctor()
 	self.m_tNameDataMap = {}
@@ -59,6 +61,13 @@ function CDataManager:GetDataByName( sDataName )
 	return self.m_tNameDataMap[ sDataName ]
 end
 
+function CDataManager:GetDataByNameAndId( sDataName, nId )
+	local tConfData = self:GetDataByName( sDataName )
+	if tConfData ~= nil then
+		return tConfData[nId]
+	end
+end
+
 function CDataManager:GetCsvFileData( sDataName )
 	if self.m_tNameCsvDataMap[ sDataName ] ~= nil then
 		return self.m_tNameCsvDataMap[ sDataName ]
@@ -75,13 +84,20 @@ function CDataManager:ClearDataByName( sDataName )
 	self.m_tNameDataMap[sDataName] = nil
 end
 
-function CDataManager:LoadJsonData( sFileName, sDataName )
+function CDataManager:LoadJsonData( sFileName, sDataName, bNeedConvert, bIsArray )
 	--json文件数据和csv文件数据共用一个map,但是需要保证他们不重名
 	if self.m_tNameDataMap[sDataName] ~= nil then
 		assert( false )
 	end
-	local tJsonData = self:GetJsonFileData( sFileName )
-	assert( tJsonData ~= nil )
+	local tJsonData = nil
+	if bNeedConvert ~= true then
+		tJsonData = self:GetJsonFileData( sFileName )
+		assert( tJsonData ~= nil )
+	else
+		JsonParser.setVECTOR_SEP( "|" )
+		tJsonData = {}
+		JsonParser.parseFileEx( tJsonData, sFileName, false, bIsArray )
+	end
 	self.m_tNameDataMap[ sDataName ] = tJsonData
 	return tJsonData
 end
@@ -92,7 +108,7 @@ function CDataManager:GetJsonFileData( sFileName )
 	end
 	local sFileStr = cc.FileUtils:getInstance():getStringFromFile( sFileName )
 	assert( sFileStr ~= nil )
-	local tJsonData = _G.CJSON.decode( sFileStr )
+	local tJsonData = _G.JSON.Decode( sFileStr )
 	assert( tJsonData ~= nil )
 	self.m_tJsonFileDataMap[sFileName] = tJsonData
 	return tJsonData

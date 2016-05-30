@@ -162,6 +162,10 @@ function cAppBase:GetNetFakeServerManager()
 	return self.m_oNetFakeServerManager
 end
 
+function cAppBase:GetObjectManager()
+	return self.m_oObjectManager
+end
+
 function cAppBase:GetPropertiesManager()
 	return self.m_oPropertiesManager
 end

@@ -4,10 +4,27 @@ function SceneMainGame:OnCreate()
 end
 
 function SceneMainGame:PreLoadRes()
+    local tPreLoadData = self.m_tPreLoadData
+    if tPreLoadData ~= nil then
+        tPreLoadData.Textures = {}
+        tPreLoadData.SpriteFrame = 
+        {
+        }
+        tPreLoadData.Armatures = 
+        {
+        }
+        tPreLoadData.LoadUI = 
+        {
+            "ui/loading.json",
+            "ui/smallLoading.json",
+        }
+        tPreLoadData.JsonData = 
+        {
+        }
+    end
 end
 
 function SceneMainGame:OnLoadOver()
-
     local oGameLayer = self:GetGameLayer()
     if oGameLayer == nil then
         return
@@ -21,7 +38,7 @@ function SceneMainGame:OnLoadOver()
     end
 
     local uiManager = _G.GAME_APP:GetUIManager()
-    uiManager:ShowUI( "UIGameMain", true )
+    uiManager:ShowUI( "UIGameMain", true, nil, nil, true )
 end
 
 function SceneMainGame:OnEnter()

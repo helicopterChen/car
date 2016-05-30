@@ -41,10 +41,11 @@ function cSceneManager:RealEnterScene( sceneName, bUsePhysics, args, callback, t
             oSceneRoot = display.newScene( sceneName )
         end
         if oScene ~= nil and oSceneRoot ~= nil then
+            oScene:SetGameApp( oGameApp )
             if self.m_oCurScene == nil then
                 oGameApp:SetResManagerUpdate(true)
                 oScene.m_sName = sceneName
-                oScene:SetSceneRoot( oSceneRoot )
+                oScene:SetSceneRoot( oSceneRoot, bUsePhysics)
                 oScene:OnCreate( unpack(checktable(args)) )
                 self.m_oCurScene = oScene
                 oScene:SetCallback( callback, tCallbackData )
@@ -58,7 +59,7 @@ function cSceneManager:RealEnterScene( sceneName, bUsePhysics, args, callback, t
                 end
                 collectgarbage("collect")
                 oGameApp:SetResManagerUpdate(true)
-                oScene:SetSceneRoot( oSceneRoot )
+                oScene:SetSceneRoot( oSceneRoot, bUsePhysics )
                 oScene:OnCreate( unpack(checktable(args)) )
                 oScene.m_sName = sceneName
                 self.m_oCurScene = oScene
@@ -87,7 +88,7 @@ function cSceneManager:RealEnterScene( sceneName, bUsePhysics, args, callback, t
             end
             oResManager:RunAsyncLoader( sceneName, cSceneManager.AsyncLoadOverCallback )
             --Factory.clearUnitPool()   
-            if sceneName ~= "SceneSplash" and sceneName ~= "SceneLoadSplash" then
+            if sceneName ~= "SceneSplash" and sceneName ~= "SceneLoadSplash" and sceneName ~= "UILoading" then
                 if CONFIG_DEBUG_INFO_PANEL == true then
                     oUIManager:ShowUI( "UIDebugInfoPanel", true )
                 end

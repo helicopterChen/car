@@ -7,8 +7,8 @@ function cSceneBaseClass:ctor()
 	self.m_oUILayer = nil
 	self.m_oGameLayer = nil
 	self.m_sName = name
-	self.resLoader = nil
-	self.timePast = 0
+	self.m_oResLoader = nil
+	self.m_nTimePast = 0
 	self.m_tPreLoadData = 
 	{
 		Textures = {},
@@ -19,7 +19,7 @@ function cSceneBaseClass:ctor()
 	}
 end
 
-function cSceneBaseClass:SetSceneRoot( oSceneRoot )
+function cSceneBaseClass:SetSceneRoot( oSceneRoot, bUsePhysics )
 	self.m_oSceneRoot = oSceneRoot
   	-- 启动帧侦听
     self:scheduleUpdate()  
@@ -36,6 +36,12 @@ function cSceneBaseClass:SetSceneRoot( oSceneRoot )
     oSceneRoot.onEnterTransitionDidFinish =
     function( ... )
     	self:onEnterTransitionDidFinish( ... )
+    end
+    if bUsePhysics == true then
+        self.m_oPhysicalWorld = oSceneRoot:getPhysicsWorld()
+        self.m_oPhysicalWorld:setAutoStep(false)
+        self.m_oPhysicalWorld:setGravity(cc.p(0, 0))
+        self.m_oPhysicalWorld:setDebugDrawMask(0)
     end
     local uiLayer = cc.Layer:create()
    	if uiLayer ~= nil then
@@ -102,6 +108,14 @@ function cSceneBaseClass:SetSceneRoot( oSceneRoot )
 	   	oSceneRoot:addChild( oGameLayer, 0 )
 	   	self.m_oGameLayer = oGameLayer
 	end
+end
+
+function cSceneBaseClass:SetGameApp( oGameApp )
+	self.m_oGameApp = oGameApp
+end
+
+function cSceneBaseClass:GetGameApp()
+	return self.m_oGameApp
 end
 
 function cSceneBaseClass:PreLoadRes()
@@ -177,8 +191,8 @@ function cSceneBaseClass:SetShowUICallback( pCallback, tCallbackData )
     self.m_tShowUICallbackData = tCallbackData
 end
 
-function cSceneBaseClass:SetResLoader( resLoader )
-	self.m_oResLoader = resLoader
+function cSceneBaseClass:SetResLoader( oResLoader )
+	self.m_oResLoader = oResLoader
 end
 
 function cSceneBaseClass:GetResLoader()
@@ -187,6 +201,7 @@ end
 
 function cSceneBaseClass:DefaultUpdate( dt )
 	if dt > 0.02 then dt = 0.02 end
+	self.m_nTimePast = self.m_nTimePast + dt 
 	local oGameApp = _G.GAME_APP
 	if oGameApp ~= nil then
 		if oGameApp.DefaultUpdate ~= nil then
@@ -195,6 +210,9 @@ function cSceneBaseClass:DefaultUpdate( dt )
 	    if oGameApp.Update ~= nil then
 	    	oGameApp:Update( dt )
 	    end
+	end
+	if self.m_oPhysicalWorld ~= nil then
+		self.m_oPhysicalWorld:step(dt)
 	end
 	if self.Update ~= nil then
 		self:Update(dt)

@@ -82,7 +82,7 @@ function cGameObject:SetPropertyVal( sPropName, val )
 end
 
 function cGameObject:InitPropertiesByType()
-	local oPropertiesManager =  CPropertiesManager:GetInstance()
+	local oPropertiesManager =  cPropertiesManager:GetInstance()
 	if oPropertiesManager ~= nil then
 		oPropertiesManager:InitObjectByProperty( self )
 	end

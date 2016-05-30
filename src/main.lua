@@ -12,6 +12,8 @@ function( ... )
 	end
 end
 
+_G.CC_LOG = print
+
 local __require = _G["require"]
 
 function __myRequire( path )
@@ -37,7 +39,7 @@ collectgarbage("setpause", 100)
 collectgarbage("setstepmul", 5000)
 local MyApp = require("app.MyApp")
 
-if DEBUG_MOB_OPEN == true then
+if CONFIG_DEBUG_MOB_OPEN == true then
 	require("mobdebug").start()
 end
 

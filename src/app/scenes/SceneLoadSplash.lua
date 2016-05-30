@@ -1,6 +1,6 @@
-local NewSceneLoadSplash = class("NewSceneLoadSplash", _G.GAME_BASE.cSceneBaseClass )
+local SceneLoadSplash = class("SceneLoadSplash", _G.GAME_BASE.cSceneBaseClass )
 
-function NewSceneLoadSplash:OnCreate()
+function SceneLoadSplash:OnCreate()
     local logoPng = cc.Sprite:create( "icon.png" )
     if logoPng ~= nil then
         logoPng:setPosition( cc.p( display.width/ 2, display.height/2) )
@@ -9,7 +9,7 @@ function NewSceneLoadSplash:OnCreate()
     end
 end
 
-function NewSceneLoadSplash:PreLoadRes()
+function SceneLoadSplash:PreLoadRes()
 	--CfgData.loadConstAndInit()
     --cUnit.initLocalConst()
 	local tPreLoadData = self.m_tPreLoadData
@@ -32,12 +32,12 @@ function NewSceneLoadSplash:PreLoadRes()
     end
 end
 
-function NewSceneLoadSplash:OnLoadOver()
+function SceneLoadSplash:OnLoadOver()
     --app:setLanguage( CONFIG_GAME_LANGUAGE )   
     --app.uiManager:initControlStrMap()
 end
 
-function NewSceneLoadSplash:OnEnter()
+function SceneLoadSplash:OnEnter()
     if self.logoPng ~= nil then
     	local actionFadeOut = cc.FadeOut:create(1.5)
     	local callback = cc.CallFunc:create( function() 
@@ -48,7 +48,7 @@ function NewSceneLoadSplash:OnEnter()
     end
 end
 
-function NewSceneLoadSplash:OnExit()
+function SceneLoadSplash:OnExit()
 end
 
-return NewSceneLoadSplash
+return SceneLoadSplash

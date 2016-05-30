@@ -11,6 +11,9 @@ _M.cResManager = import( ".AppBase.cResManager" );
 --Avatar
 ---------------------------------------------------------
 --CommonUtility
+							  import( ".CommonUtility.Json" )
+_G.JSON = Json
+_G.JSON_PARSER 				= import(".CommonUtility.JsonParser")
 _M.CSVLoader				= import(".CommonUtility.CSVLoader");
 _M.TableUtility				= import(".CommonUtility.TableUtility");
 _M.TimeUtility				= import(".CommonUtility.TimeUtility" );
@@ -32,6 +35,7 @@ _M.cSceneManager			= import( ".Scene.cSceneManager" );
 --Spell
 ---------------------------------------------------------
 --UIUtility
+							  import( ".UIUtility.DrawPrimitivesEx" )
 _M.UILoaderEx				= import( ".UIUtility.UILoaderEx" );
 _M.UIModifier				= import( ".UIUtility.UIModifier" );
 _M.UIManager				= import( ".UIUtility.UIManager" );

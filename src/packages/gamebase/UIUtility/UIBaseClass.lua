@@ -5,6 +5,7 @@ function UIBaseClass:ctor()
 	self.m_tDynItemCacheLoadTable = {}
 	self.m_oUIRootNode = nil
 	self.m_oUIManager = nil
+	self.m_oGameApp = nil
 	self.m_bTouchSwallowEnabled = true
 	self.m_bTouchEnabled = true
 	self.m_nTouchMode = cc.TOUCH_MODE_ONE_BY_ONE
@@ -31,6 +32,14 @@ end
 
 function UIBaseClass:SetUIManager( uiManager )
 	self.m_oUIManager = uiManager
+end
+
+function UIBaseClass:SetGameApp( oGameApp )
+	self.m_oGameApp = oGameApp
+end
+
+function UIBaseClass:GetGameApp()
+	return self.m_oGameApp
 end
 
 function UIBaseClass:SetCloseCallback( closeCallback )
