@@ -1,0 +1,10 @@
+{
+"types":
+["I","S","I","I","I","I","S","I","I","I","I","I"],
+"fields":
+["id","name","type","x","y","rotation","view","param1","param2","param3","param4","param5"],
+"values":
+[
+["20002","蝎子","2","950","466","0","png/model_xiezhi.png","55","330","50","300",""]
+]
+}

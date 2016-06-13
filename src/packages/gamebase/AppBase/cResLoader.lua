@@ -307,7 +307,7 @@ function cResLoader:LoadOneJsonData()
 		if tLoadWork ~= nil then
 			self.m_tCurLoadingFileConf = tLoadWork
 			self:PrintLoadInfo( false, self.m_tCurLoadingFileConf )
-			self.m_oResManager:addJsonFileDecodeAsync( tLoadWork.FilePath, LoadJsonDataCallback )
+			self.m_oResManager:AddJsonFileDecodeAsync( tLoadWork.FilePath, LoadJsonDataCallback )
 		else
 			self.m_tCurLoadingFileConf = nil
 			self:ConvertOneCfgData()
@@ -395,7 +395,7 @@ function cResLoader:LoadOneSpriteFrame()
 		if tLoadWork ~= nil then
 			self.m_tCurLoadingFileConf = tLoadWork
 			self:PrintLoadInfo( false, self.m_tCurLoadingFileConf )
-			self.m_oResManager:addSpriteFramesWithFileAsync( tLoadWork.FilePath, tLoadWork.Params, LoadSpriteFrameCallback )
+			self.m_oResManager:AddSpriteFramesWithFileAsync( tLoadWork.FilePath, tLoadWork.Params, LoadSpriteFrameCallback )
 		else
 			self.m_tCurLoadingFileConf = nil
 			self:LoadOneArmature()
@@ -404,7 +404,7 @@ function cResLoader:LoadOneSpriteFrame()
 end
 
 function cResLoader:PrintLoadInfo( bOk, tLoadingFileConf )
-	if DEBUG_GAME_SHOW_LOAD_RES_INFO ~= true then
+	if CONFIG_DEBUG_SHOW_LOAD_RES_INFO ~= true then
 		return
 	end
 	if bOk ~= true then
@@ -429,7 +429,7 @@ function cResLoader:UpdateAsyncWorkLoadedOk( sWorkType )
 			if bHaveLoadedFile == false then	--也就是每次回调，这里只判定为加载了一个文件，而不是多个
 				local bCheckLoaded = false
 				if sWorkType == "TEXTURE" then
-					local oTexture = oTextureCache:textureForKey( v.FilePath )
+					local oTexture = oTextureCache:getTextureForKey( v.FilePath )
 					if oTexture ~= nil then
 						bCheckLoaded = true
 					end
@@ -444,7 +444,7 @@ function cResLoader:UpdateAsyncWorkLoadedOk( sWorkType )
 						bCheckLoaded = true
 					end
 				elseif sWorkType == "JSON_DATA" then
-					local bIsJsonLoaded = self.m_oResManager:isJsonCfgDataLoaded( v.FilePath )
+					local bIsJsonLoaded = self.m_oResManager:IsJsonCfgDataLoaded( v.FilePath )
 					if bIsJsonLoaded == true then
 						self.m_oResManager:initJsonFieldsAndTypes( v.FilePath, v.Params )
 						bCheckLoaded = true
@@ -455,7 +455,7 @@ function cResLoader:UpdateAsyncWorkLoadedOk( sWorkType )
 						bCheckLoaded = true
 					end
 				elseif sWorkType == "CFG_DATA" then
-					local bIsCfgDataConverted = self.m_oResManager:isCfgDataConverted( v.FilePath )
+					local bIsCfgDataConverted = self.m_oResManager:IsCfgDataConverted( v.FilePath )
 					if bIsCfgDataConverted == true then
 						bCheckLoaded = true
 					end

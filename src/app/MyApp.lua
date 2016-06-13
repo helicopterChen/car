@@ -20,9 +20,11 @@ function MyApp:Run()
 end
 
 function MyApp:LoadDataConfig()
-	self.m_oDataManager:LoadJsonData( "config/Towers.json", "TowersConf", true, true );
-	self.m_oDataManager:LoadJsonData( "config/Missions.json", "MissionsConf", true );
-	self.m_oDataManager:LoadJsonData( "config/Cars.json", "CarConf", true );
+	self.m_oDataManager:LoadJsonData( "config/Towers.json", "TowersConf", true, true )
+	self.m_oDataManager:LoadJsonData( "config/Missions.json", "MissionsConf", true )
+	self.m_oDataManager:LoadJsonData( "config/MissionView.json", "MissionViewConf", true )
+	self.m_oDataManager:LoadJsonData( "config/Cars.json", "CarConf", true )
+	self.m_oDataManager:LoadJsonData( "config/MapItems.json", "MapItemsConf", true, true )
 end
 
 function MyApp:OnUpdate( nTimeDelta )

@@ -133,8 +133,8 @@ function cResManager:AddSpriteFramesWithFileAsync( plistPath, textureName, funcC
         end
         local fileUtil = cc.FileUtils:getInstance()
         local fullPath = string.gsub( fileUtil:fullPathForFilename(plistPath), "\\", "/" )
-        self:addSearchPathIf(io.pathinfo(fullPath).dirname, fileUtil)
-        local bAddOk = self.m_oGameResLoader:addSpriteFramesWithFileAsync( plistPath, textureName, funcCallback )
+        self:AddSearchPathIf(io.pathinfo(fullPath).dirname, fileUtil)
+        local bAddOk = self.m_oGameResLoader:AddSpriteFramesWithFileAsync( plistPath, textureName, funcCallback )
     	if bAddOk ~= true then
 	    	funcCallback()
     	end
@@ -148,11 +148,11 @@ function cResManager:AddJsonFileDecodeAsync( jsonFilePath, funcCallback )
         end
         local fileUtil = cc.FileUtils:getInstance()
         local fullPath = string.gsub( fileUtil:fullPathForFilename(jsonFilePath), "\\", "/" )
-        self:addSearchPathIf(io.pathinfo(fullPath).dirname, fileUtil)
+        self:AddSearchPathIf(io.pathinfo(fullPath).dirname, fileUtil)
         if self.m_oGameResLoader.m_bIsFake == true then
-        	self.m_oGameResLoader:addJsonFileDecodeAsync( jsonFilePath, funcCallback )
+        	self.m_oGameResLoader:AddJsonFileDecodeAsync( jsonFilePath, funcCallback )
         else
-	        local bAddOk = self.m_oGameResLoader:addJsonFileDecodeAsync( jsonFilePath, funcCallback )
+	        local bAddOk = self.m_oGameResLoader:AddJsonFileDecodeAsync( jsonFilePath, funcCallback )
 	    	if bAddOk ~= true then
 	    		if funcCallback ~= nil then
 		    		funcCallback()
@@ -167,7 +167,7 @@ function cResManager:AddUINodePreCreateAsync( uiJsonFilePath, funcCallback )
 end
 
 function cResManager:AddConvertCfgDataAsync( jsonFilePath, tCfgDef, funcCallback )
-	local bLoaded = self:isJsonCfgDataLoaded(jsonFilePath)
+	local bLoaded = self:IsJsonCfgDataLoaded(jsonFilePath)
 	if bLoaded == true then
 		self.m_oCfgConvertDataQueue:InQueue( {jsonFilePath, tCfgDef, funcCallback} )
 	end
@@ -208,7 +208,7 @@ function cResManager:ConverJsonCfgData( jsonDataFilePath, tCfgDef, funcCallback 
 				funcCallback()
 			end
 		else
-			local tJsonData = self:getJsonCfgDataByName(jsonDataFilePath)
+			local tJsonData = self:GetJsonCfgDataByName(jsonDataFilePath)
 			if tJsonData ~= nil then
 				local vaules = tJsonData.values
 				local nCount = vaules:count()
@@ -284,7 +284,7 @@ end
 
 function cResManager:GetCfgDataByIdx( jsonDataFilePath, nBegin, nEnd )
 	local tData = {}
-	local tJsonData = self:getJsonCfgDataByName(jsonDataFilePath)
+	local tJsonData = self:GetJsonCfgDataByName(jsonDataFilePath)
 	local tTypeAndFieldsDef = self.m_tCfgTypeAndFieldsDefData[jsonDataFilePath]
 	if tJsonData ~= nil and tTypeAndFieldsDef ~= nil then
 		local types = tTypeAndFieldsDef.Types
@@ -335,20 +335,20 @@ function cResManager:ResetUIJsonFileData(uiJsonFilePath)
 end
 
 function cResManager:GetJsonCfgDataByName( jsonPathName )
-	return self.m_oGameResLoader:getJsonCfgDataByName( jsonPathName )
+	return self.m_oGameResLoader:GetJsonCfgDataByName( jsonPathName )
 end
 
 function cResManager:IsSpriteFrameLoaded( spriteFrameFile )
-	return self.m_oGameResLoader:isSpriteFrameLoaded(spriteFrameFile)
+	return self.m_oGameResLoader:IsSpriteFrameLoaded(spriteFrameFile)
 end
 
 function cResManager:IsJsonCfgDataLoaded( filePath )
-	return self.m_oGameResLoader:isJsonCfgDataLoaded(filePath)
+	return self.m_oGameResLoader:IsJsonCfgDataLoaded(filePath)
 end
 
 function cResManager:InitJsonFieldsAndTypes( filePath )
 	if self.m_oGameResLoader.m_bIsFake ~= true then
-		local tJsonCfgData = self:getJsonCfgDataByName( filePath )
+		local tJsonCfgData = self:GetJsonCfgDataByName( filePath )
 		if tJsonCfgData ~= nil then
 			local types = tJsonCfgData.types
 			local fields = tJsonCfgData.fields
@@ -437,7 +437,7 @@ function cResManager:AddSearchPathIf(dir, fileUtil)
         self.m_tSearchDirs = {}
     end
 
-    if not self:isSearchExist(dir) then
+    if not self:IsSearchExist(dir) then
         table.insert(self.m_tSearchDirs, dir)
         if not fileUtil then
             fileUtil = cc.FileUtils:getInstance()

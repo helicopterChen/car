@@ -59,10 +59,10 @@ end
 
 function DrawNode:drawDebugSector( tCenter, nArrowAngle, nSectorAngle, nMinRadius, nMaxRadius, bIsReverse )
 	local nSegments = math.floor(nSectorAngle / 15)
-	if nSegments < 18 then
-		nSegments = 18
+	if nSegments < 10 then
+		nSegments = 10
 	end
-	self:drawSolidSector(tCenter, nArrowAngle, nSectorAngle, nMinRadius, nMaxRadius, nSegments, cc.c4f(0,0,1,0.25))
+	self:drawSolidSector(tCenter, nArrowAngle, nSectorAngle, nMinRadius, nMaxRadius, nSegments, cc.c4f(0,0,1,0.15))
 	self:drawSector(tCenter, nArrowAngle, nSectorAngle, nMinRadius, nMaxRadius, nSegments, cc.c4f(1,0,1,0.8))
 	local coef = ((math.pi / 180) * nSectorAngle) / nSegments
 	local beginRads = (nArrowAngle - nSectorAngle / 2) * ( (math.pi / 180) )	

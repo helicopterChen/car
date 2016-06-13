@@ -386,6 +386,10 @@ function UIPageView:onTouch_(event)
 		self:stopAllTransition()
 		self.bDrag_ = false
 	elseif "moved" == event.name then
+		if math.abs(event.x - event.prevX) < 3 then
+			self.bDrag_ = false
+			return false
+		end
 		self.bDrag_ = true
 		self.speed = event.x - event.prevX
 		self:scroll(self.speed)

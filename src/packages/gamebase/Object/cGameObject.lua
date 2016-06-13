@@ -1,12 +1,17 @@
 local cGameObject = class( "cGameObject" )
+local cDataTableEx = import( "..CommonUtility.cDataTableEx" )
 local cPropertiesManager = import( ".cPropertiesManager" )
 
 function cGameObject:ctor()
 	self.m_tProperties = {}
+	self.m_tDirtyFlag = cDataTableEx:create()
 	self.m_nGameObjectId = 0
 	self.m_tContainers = {}
 	self.m_sObjectType = "UNKNOWN"
 	self.m_bNeedDelete = false
+end
+
+function cGameObject:OnInit()
 end
 
 function cGameObject:SetGameObjectId( nGameObjectId )
@@ -36,6 +41,10 @@ end
 
 function cGameObject:SetProperties( tProperties )
 	self.m_tProperties = tProperties
+	for i, v in pairs( self.m_tProperties ) do
+		self.m_tDirtyFlag[i] = { OldVal = v, CurVal = v }
+	end
+	self.m_tDirtyFlag:ResetDirty()
 end
 
 function cGameObject:GetPropertieConf()
@@ -66,9 +75,22 @@ end
 
 function cGameObject:SetPropertyVal( sPropName, val )
 	local tAttriConf = self:GetPropertieConfByAttriName( sPropName )
-	if tAttriConf ~= nil and self.m_tProperties[ sPropName ] ~= nil then
+	local oldVal = self.m_tProperties[ sPropName ]
+	if tAttriConf ~= nil and oldVal ~= nil then
 		if tAttriConf.Type == "string" then
 			self.m_tProperties[ sPropName ] = val or tAttriConf.DefaultVal
+		elseif tAttriConf.Type == "boolean" then
+			if type(val) == "boolean" then
+				self.m_tProperties[ sPropName ] = val
+			else
+				if v.DefaultVal == "true" then
+					self.m_tProperties[sPropName] = true
+					val = true
+				else
+					self.m_tProperties[sPropName] = false
+					val = false
+				end
+			end
 		else
 			if tAttriConf.Round == "Up" then
 				self.m_tProperties[ sPropName ] = math.ceil(tonumber(val) or tonumber(tAttriConf.DefaultVal))
@@ -77,6 +99,9 @@ function cGameObject:SetPropertyVal( sPropName, val )
 			else
 				self.m_tProperties[ sPropName ] = tonumber(val) or tonumber(tAttriConf.DefaultVal)
 			end
+		end
+		if oldVal ~= val then
+			self.m_tDirtyFlag[sPropName] = { OldVal = oldVal, CurVal = val}
 		end
 	end
 end
@@ -136,17 +161,34 @@ function cGameObject:SetPropertiesByConfig( tConfigData )
 		local tPropertieConf = self:GetPropertieConf()
 		if tPropertieConf ~= nil then
 			for i, v in ipairs( tPropertieConf ) do
-				if tConfigData[v.AttriName] ~= nil then
-					if v.Type ~= "string" then
-						if v.Round == "Up" then
-							self.m_tProperties[ v.AttriName ] = math.ceil( tConfigData[v.AttriName] or tonumber(v.DefaultVal) )
-						elseif v.Round == "Down" then
-							self.m_tProperties[ v.AttriName ] = math.floor( tConfigData[v.AttriName] or tonumber(v.DefaultVal) )
+				local sAttriName = v.AttriName
+				local oldVal = self.m_tProperties[sAttriName]
+				if tConfigData[sAttriName] ~= nil then
+					local newVal = nil
+					if v.Type == "string" then
+						newVal = tConfigData[sAttriName] or v.DefaultVal
+					elseif v.Type == "boolean" then
+						if type(tConfigData[sAttriName]) == "boolean" then
+							newVal = tConfigData[sAttriName]
 						else
-							self.m_tProperties[ v.AttriName ] = tConfigData[v.AttriName] or tonumber(v.DefaultVal)
+							if v.DefaultVal == "true" then
+								newVal = true
+							else
+								newVal = false
+							end
+						end	
+					elseif v.Type ~= "string" then
+						if v.Round == "Up" then
+							newVal = math.ceil( tConfigData[sAttriName] or tonumber(v.DefaultVal) )
+						elseif v.Round == "Down" then
+							newVal = math.floor( tConfigData[sAttriName] or tonumber(v.DefaultVal) )
+						else
+							newVal = tConfigData[sAttriName] or tonumber(v.DefaultVal)
 						end
-					else
-						self.m_tProperties[ v.AttriName ] = tConfigData[v.AttriName] or v.DefaultVal
+					end
+					self.m_tProperties[sAttriName] = newVal
+					if oldVal ~= newVal then
+						self.m_tDirtyFlag[sAttriName] = { OldVal = oldVal, CurVal = newVal}
 					end
 				end
 			end
@@ -161,7 +203,7 @@ function cGameObject:ReadPropertiesFromPacket( oPacket )
 	local tPropertieConf = self:GetPropertieConf()
 	if tPropertieConf ~= nil then
 		for i, v in ipairs( tPropertieConf ) do
-			if v.SYN == true then --需要进行同步的属性才会进行读取
+			if v.SYN == true then --ÐèÒª½øÐÐÍ¬²½µÄÊôÐÔ²Å»á½øÐÐ¶ÁÈ¡
 				if v.Type ~= "string" then
 					if v.Round == "Up" then
 						self.m_tProperties[ v.AttriName ] = math.ceil(oPacket:ReadByFormat( v.Type ) or tonumber(v.DefaultVal))
@@ -238,6 +280,13 @@ function cGameObject:Update()
 end
 
 function cGameObject:DefaultUpdate()
+	if self.OnPropertiesChanged ~= nil and self.m_tDirtyFlag:IsDirty() == true then
+		self:OnPropertiesChanged( self.m_tDirtyFlag:GetData() )
+		for i, v in pairs( self.m_tProperties ) do
+			self.m_tDirtyFlag[i] = {OldVal=v,CurVal=v}
+		end
+		self.m_tDirtyFlag:ResetDirty()
+	end
 end
 
 return cGameObject

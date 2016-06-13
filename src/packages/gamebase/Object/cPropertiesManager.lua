@@ -39,6 +39,12 @@ function cPropertiesManager:InitObjectByProperty( oGameObject )
 		for i, v in ipairs( tPropConf ) do
 			if v.Type == "string" then
 				tObjectProperties[v.AttriName] = v.DefaultVal
+			elseif v.Type == "boolean" then
+				if v.DefaultVal == "true" then
+					tObjectProperties[v.AttriName] = true
+				else
+					tObjectProperties[v.AttriName] = false
+				end
 			else
 				tObjectProperties[v.AttriName] = tonumber( v.DefaultVal )
 			end

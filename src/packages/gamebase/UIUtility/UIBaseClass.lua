@@ -62,7 +62,7 @@ function UIBaseClass:SeekNodeByPath( childNodePath )
 end
 
 function UIBaseClass:AddDynamicItemCache( json, num )
-	local uiManager = self:getUIManager()
+	local uiManager = self:GetUIManager()
 	if uiManager == nil then
 		return
 	end
@@ -70,12 +70,12 @@ function UIBaseClass:AddDynamicItemCache( json, num )
 		local tItemCaches = {}
 		local tUnusedDynItemIdx = {}
 		for i = 1, num do
-			local listItemRootNode, width, height = uiManager:loadUIFromFilePath( json )
+			local listItemRootNode, width, height = uiManager:LoadUIFromFilePath( json )
 			local listItem = ccuiloader_seekNodeEx(listItemRootNode, "ref")
 			if listItem then
 		        listItem:retain()
 		        listItem:setVisible(true)
-		        listItem:removeFromParentAndCleanup(false)
+		        listItem:removeFromParent(false)
 		    end
 		    listItem.nIndex = i
 			table.insert( tItemCaches, listItem )
@@ -90,7 +90,7 @@ function UIBaseClass:AddDynamicItemCacheByName( json, uiNode )
 	if json == nil or uiNode == nil then
 		return
 	end
-	local uiManager = self:getUIManager()
+	local uiManager = self:GetUIManager()
 	if uiManager == nil then
 		return
 	end
@@ -104,7 +104,7 @@ function UIBaseClass:AddDynamicItemCacheByName( json, uiNode )
 	if listItem ~= nil then
 		listItem:retain()
         listItem:setVisible(true)
-        listItem:removeFromParentAndCleanup(true)
+        listItem:removeFromParent(true)
 		local nIdx = #tItemCaches + 1
 		listItem.nIdx = nIdx
 		table.insert( self.m_tDynamicItemCache[json], listItem )
@@ -121,25 +121,25 @@ function UIBaseClass:IsDynamicItemCacheInited( json )
 end
 
 function UIBaseClass:GetUnusedDynamicItemCache( json )
-	local uiManager = self:getUIManager()
+	local uiManager = self:GetUIManager()
 	if uiManager == nil then
 		return
 	end
 	local tDynItemCache = self.m_tDynamicItemCache[json]
 	if tDynItemCache == nil then
-		self:addDynamicItemCache( json, 10 )
+		self:AddDynamicItemCache( json, 10 )
 	end
 	tDynItemCache = self.m_tDynamicItemCache[json]
 	local listItemCacheCount = #tDynItemCache
 	local tUnusedDynItemIdx = self.m_tUnusedDynItemIdx[json]
 	if #tUnusedDynItemIdx == 0 then
 		for i = 1, 10 do
-			local listItemRootNode, width, height = uiManager:loadUIFromFilePath( json )
+			local listItemRootNode, width, height = uiManager:LoadUIFromFilePath( json )
 			local listItem = ccuiloader_seekNodeEx(listItemRootNode, "ref")
 			if listItem then
 		        listItem:retain()
 		        listItem:setVisible(true)
-		        listItem:removeFromParentAndCleanup(false)
+		        listItem:removeFromParent(false)
 		    end
 		    listItem.nIndex = listItemCacheCount + i
 			table.insert( tDynItemCache, listItem )
@@ -163,7 +163,7 @@ function UIBaseClass:ClearDynmicItemUseMark( json )
 			if v.removeAllNodeEventListeners ~= nil then
 				v:removeAllNodeEventListeners()
 			end
-			v:removeFromParentAndCleanup(false)
+			v:removeFromParent(false)
 			self:ResetChildCtrlVisible( v, v.options )
 			self.m_tUnusedDynItemIdx[json][i] = i
 		end
@@ -221,11 +221,11 @@ function UIBaseClass:DoUIOpenNodeScaleAction( nodePath, callback, callbackData )
 		scaleNode:setPosition( cc.p( originX + contentSize.width / 2, originY + contentSize.height / 2) )
 		scaleNode:setScale(0.01)
 		scaleNode:setVisible(true)
-		local array = CCArray:create()
-        local scaleTo1 = CCScaleTo:create( 0.15, 1.15, 1.15 )
-        local scaleTo2 = CCScaleTo:create( 0.1, 0.95, 0.95 )
-        local scaleTo3 = CCScaleTo:create( 0.08, 1, 1 )
-        local endedCallback = CCCallFunc:create(function()
+		local tActionArray = {}
+        local scaleTo1 = cc.ScaleTo:create( 0.15, 1.15, 1.15 )
+        local scaleTo2 = cc.ScaleTo:create( 0.1, 0.95, 0.95 )
+        local scaleTo3 = cc.ScaleTo:create( 0.08, 1, 1 )
+        local endedCallback = cc.CallFunc:create(function()
         											scaleNode:setAnchorPoint( cc.p( 0, 0 ) ) 
         									    	scaleNode:setPosition( cc.p( originX, originY ) )
         									    	self.m_bIsScaling = false
@@ -233,17 +233,17 @@ function UIBaseClass:DoUIOpenNodeScaleAction( nodePath, callback, callbackData )
         									    		callback( callbackData )
         									    	end
         									    end)
-        array:addObject(scaleTo1)
-        array:addObject(scaleTo2)
-        array:addObject(scaleTo3)
-        array:addObject(endedCallback)
-        local sequence = CCSequence:create( array )
+        table.insert(tActionArray,scaleTo1)
+        table.insert(tActionArray,scaleTo2)
+        table.insert(tActionArray,scaleTo3)
+        table.insert(tActionArray,endedCallback)
+        local sequence = cc.Sequence:create( tActionArray )
 		scaleNode:runAction( sequence )
 	end
 end
 
 function UIBaseClass:ShowSystemTips( sTips )
-	local uiManager = self:getUIManager()
+	local uiManager = self:GetUIManager()
 	if uiManager ~= nil then
 		uiManager:ShowSystemTips( sTips )
 	end
@@ -369,7 +369,7 @@ function UIBaseClass:__getButtonByName( sGroupName, sButtonName )
 end
 
 function UIBaseClass:ShowSystemTips( sStrId )
-	local uiManager = self:getUIManager()
+	local uiManager = self:GetUIManager()
 	if uiManager ~= nil then
 		uiManager:ShowSystemTips( app:GET_STR( sStrId ) )
 	end
@@ -399,7 +399,7 @@ function UIBaseClass:GetItemSlotInfoByName( sItemSlotName )
 end
 
 function UIBaseClass:AddAnimToNodeByPath( sNodePath, nId, nAnimId, nZOrder, nOX, nOY, nScale )
-	local uiManager = self:getUIManager()
+	local uiManager = self:GetUIManager()
 	local oNode = self:SeekNodeByPath( sNodePath )
 	if uiManager ~= nil and oNode ~= nil then
 		uiManager:AddAnimToNode( oNode, nId, nAnimId, nZOrder, nOX, nOY, nScale )
@@ -407,14 +407,14 @@ function UIBaseClass:AddAnimToNodeByPath( sNodePath, nId, nAnimId, nZOrder, nOX,
 end
 
 function UIBaseClass:AddAnimToNode( oNode, nId, nAnimId, nZOrder, nOX, nOY, nScale )
-	local uiManager = self:getUIManager()
+	local uiManager = self:GetUIManager()
 	if uiManager ~= nil and oNode ~= nil then
 		uiManager:AddAnimToNode( oNode, nId, nAnimId, nZOrder, nOX, nOY, nScale )
 	end
 end
 
 function UIBaseClass:RemoveAnimFromNodeByPath( sNodePath, nId )
-	local uiManager = self:getUIManager()
+	local uiManager = self:GetUIManager()
 	local oNode = self:SeekNodeByPath( sNodePath )
 	if uiManager ~= nil and oNode ~= nil then
 		uiManager:RemoveAnimByIdFromNode( oNode, nId )
@@ -422,14 +422,14 @@ function UIBaseClass:RemoveAnimFromNodeByPath( sNodePath, nId )
 end
 
 function UIBaseClass:RemoveAnimFromNode( oNode, nId )
-	local uiManager = self:getUIManager()
+	local uiManager = self:GetUIManager()
 	if uiManager ~= nil and oNode ~= nil then
 		uiManager:RemoveAnimByIdFromNode( oNode, nId )
 	end
 end
 
 function UIBaseClass:ClearAllAnimFromNodeByPath( sNodePath )
-	local uiManager = self:getUIManager()
+	local uiManager = self:GetUIManager()
 	local oNode = self:SeekNodeByPath( sNodePath )
 	if uiManager ~= nil and oNode ~= nil then
 	end
@@ -437,7 +437,7 @@ function UIBaseClass:ClearAllAnimFromNodeByPath( sNodePath )
 end
 
 function UIBaseClass:ClearAllAnimFromNode( oNode )
-	local uiManager = self:getUIManager()
+	local uiManager = self:GetUIManager()
 	if uiManager ~= nil and oNode ~= nil then
 		uiManager:ClearAllAnimFromNode( oNode )
 	end
@@ -559,7 +559,7 @@ function UIBaseClass:updateSlotView( sItemSlotName )
 		if itemInfo ~= nil then
 			if itemIconSprite ~= nil then
 				itemIconSprite:setVisible( true )
-				local slotSprite = self.m_oUIManager:replaceSpriteIcon( itemIconSprite, itemInfo.plistFile, itemInfo.iconName, false )
+				local slotSprite = self.m_oUIManager:ReplaceSpriteIcon( itemIconSprite, itemInfo.plistFile, itemInfo.iconName, false )
 				if slotSprite ~= nil then
 					tItemSlotInfo.SlotSprite = slotSprite
 				end
@@ -626,7 +626,7 @@ function UIBaseClass:updateSlotView( sItemSlotName )
 end
 
 function UIBaseClass:GetUIControlByPath( uiName, controlPath )
-	local uiManager = self:getUIManager()
+	local uiManager = self:GetUIManager()
 	if uiManager == nil then
 		return
 	end

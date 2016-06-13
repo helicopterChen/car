@@ -12,6 +12,7 @@ function UILoading:InitData()
 end
 
 function UILoading:OnShowUI()
+	self.m_oLoadingProgressBar = self:SeekNodeByPath( "ref/loadingProgressBar" )
 end
 
 function UILoading:OnCloseUI()
@@ -44,15 +45,18 @@ function UILoading:OnUpdateUI()
 	end
 	local nTimePercent = (oCurScene.m_nTimePast / 1.5);
 	if nTimePercent >= 1 then
-		nTimePercent = 1;
+		nTimePercent = 1
 	end
-	local nPercent = (((nLoadedSize / nTotalSize) +  nTimePercent ) / 2);
+	local nPercent = (((nLoadedSize / nTotalSize) +  nTimePercent ) / 2)
 	if nPercent >= 1 then
-		nPercent = 1;
+		nPercent = 1
 		if self.m_bCanclose == true then
 			self:Close()
 		end
 	end
+	if self.m_oLoadingProgressBar ~= nil then
+		self.m_oLoadingProgressBar:setPercent( nPercent * 100 )
+	end	
 end
 
 function UILoading:SetCanClose()

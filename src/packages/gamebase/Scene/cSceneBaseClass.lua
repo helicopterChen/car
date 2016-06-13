@@ -30,6 +30,9 @@ function cSceneBaseClass:SetSceneRoot( oSceneRoot, bUsePhysics )
     end
     oSceneRoot.onExit = 
     function( ... )
+    	if self.m_oPhysicalWorld ~= nil then
+    		self.m_oPhysicalWorld:removeAllBodies()
+    	end
     	self:OnExit( ... )
     	self:unscheduleUpdate()
     end
@@ -52,8 +55,8 @@ function cSceneBaseClass:SetSceneRoot( oSceneRoot, bUsePhysics )
 	   	if self.m_sName ~= "SceneSplash" and self.m_sName ~= "SceneLoadSplash" then
 		   	uiLayer:addNodeEventListener(cc.KEYPAD_EVENT,
 	   		function(event)
-	   			local uiManager = app.uiManager
-	   			local sdkAdapter = app.sdkAdapter
+	   			local uiManager = _G.GAME_APP:GetUIManager()
+	   			local sdkAdapter = _G.GAME_APP.GetSDKAdapter()
 	   			if uiManager == nil or sdkAdapter == nil then
 	   				return
 	   			end
@@ -61,6 +64,7 @@ function cSceneBaseClass:SetSceneRoot( oSceneRoot, bUsePhysics )
 	   				return
 	   			end
 	   			if event.key == "back" then
+	   				--[[
 	   				local function choiceCancelCallback()
 	   					local curScene = app.sceneManager:GetCurScene()
 		   				if curScene ~= nil and curScene.pauseGame ~= nil then
@@ -99,6 +103,10 @@ function cSceneBaseClass:SetSceneRoot( oSceneRoot, bUsePhysics )
 						CloseCallbackData = nil,
 					}
 					uiManager:showExitDialog( tData )
+					--]]
+					local function showQuitCallback()
+					end
+					uiManager:ShowUI( "UIQuitGamePanel", true, showQuitCallback )
 	   			end 
 	   		end)
 		end
@@ -211,12 +219,18 @@ function cSceneBaseClass:DefaultUpdate( dt )
 	    	oGameApp:Update( dt )
 	    end
 	end
-	if self.m_oPhysicalWorld ~= nil then
-		self.m_oPhysicalWorld:step(dt)
+	if self.m_bPaused ~= true then
+		if self.m_oPhysicalWorld ~= nil then
+			self.m_oPhysicalWorld:step(dt)
+		end
+		if self.Update ~= nil then
+			self:Update(dt)
+		end
 	end
-	if self.Update ~= nil then
-		self:Update(dt)
-	end
+end
+
+function cSceneBaseClass:SetPause( bPause )
+	self.m_bPaused = bPause
 end
 
 function cSceneBaseClass:addChild( node, zorder, tag )

@@ -12,7 +12,7 @@ end
 function SceneLoadSplash:PreLoadRes()
 	--CfgData.loadConstAndInit()
     --cUnit.initLocalConst()
-	local tPreLoadData = self.m_tPreLoadData
+    local tPreLoadData = self.m_tPreLoadData
     if tPreLoadData ~= nil then
         tPreLoadData.Textures = {}
         tPreLoadData.SpriteFrame = 

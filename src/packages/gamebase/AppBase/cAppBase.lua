@@ -84,16 +84,14 @@ function cAppBase:DefaultCreate()
 end
 
 function cAppBase:DefaultUpdate( nTimeDelta )
-	if GAME_PAUSE_UPDATE ~= true then
-		self.m_oResManager:Update( nTimeDelta )
-		self.m_oSceneManager:Update( nTimeDelta )
-		self.m_oObjectManager:Update( nTimeDelta )
-		self.m_oServerObjectManager:Update( nTimeDelta )
-		self.m_oUIManager:Update( nTimeDelta )
-		self.m_oNetConnectionManager:Update( nTimeDelta )
-		self.m_oNetFakeServerManager:Update( nTimeDelta )
-		self:OnUpdate( nTimeDelta )
-	end
+	self.m_oResManager:Update( nTimeDelta )
+	self.m_oSceneManager:Update( nTimeDelta )
+	self.m_oObjectManager:Update( nTimeDelta )
+	self.m_oServerObjectManager:Update( nTimeDelta )
+	self.m_oUIManager:Update( nTimeDelta )
+	self.m_oNetConnectionManager:Update( nTimeDelta )
+	self.m_oNetFakeServerManager:Update( nTimeDelta )
+	self:OnUpdate( nTimeDelta )
 end
 
 function cAppBase:OnUpdate( nTimeDelta )
@@ -144,6 +142,10 @@ end
 
 function cAppBase:GetUIManager()
 	return self.m_oUIManager
+end
+
+function cAppBase:GetSDKAdapter()
+	return {}
 end
 
 function cAppBase:GetNetConnectionManager()

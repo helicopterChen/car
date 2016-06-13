@@ -575,7 +575,7 @@ function CCSUILoader:createLabel(options)
 
 	node:align(self:getAnchorType(options.anchorPointX or 0.5, options.anchorPointY or 0.5),
 		options.x or 0, options.y or 0)
-
+	node:setSystemFontSize(options.fontSize or 20)
 	return node
 end
 

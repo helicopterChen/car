@@ -1,3 +1,5 @@
+require "app.gameObject.CWorldObject"
 require "app.gameObject.CGameCar"
 require "app.gameObject.CAnchorTower"
 require "app.gameObject.CMagneticTower"
+require "app.gameObject.CMapItem"

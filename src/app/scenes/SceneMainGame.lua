@@ -9,14 +9,14 @@ function SceneMainGame:PreLoadRes()
         tPreLoadData.Textures = {}
         tPreLoadData.SpriteFrame = 
         {
+            {"png/ui1_list.plist","png/ui1_list.png"},
+            {"png/race_list.plist","png/race_list.png"},
+            {"png/uibg_frame_list.plist","png/uibg_frame_list.png"},
         }
-        tPreLoadData.Armatures = 
-        {
-        }
+        tPreLoadData.Armatures = {}
         tPreLoadData.LoadUI = 
         {
-            "ui/loading.json",
-            "ui/smallLoading.json",
+            "ui/gameMain.json",
         }
         tPreLoadData.JsonData = 
         {
@@ -29,16 +29,15 @@ function SceneMainGame:OnLoadOver()
     if oGameLayer == nil then
         return
     end
-    local oBgImg = cc.Sprite:create("jpg/ui_game_option.jpg")
+    local oBgImg = cc.Sprite:create("png/bg_01.png")
     if oBgImg ~= nil then
         oGameLayer:addChild(oBgImg,0,-1)
         oBgImg:setAnchorPoint( 0.5, 0.5 )
-        oBgImg:setScale( 0.55 )
         oBgImg:setPosition( cc.p(display.width/2,display.height/2) )
     end
 
     local uiManager = _G.GAME_APP:GetUIManager()
-    uiManager:ShowUI( "UIGameMain", true, nil, nil, true )
+    uiManager:ShowUI( "UIMainMenu", true, nil, nil, true )
 end
 
 function SceneMainGame:OnEnter()

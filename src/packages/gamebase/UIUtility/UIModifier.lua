@@ -320,6 +320,17 @@ function UIPanel:getPanelChild_(children, name)
 	return
 end
 
+local UIPageView = cc.ui.UIPageView
+
+function UIPageView:setPageColAndRow( column, row )
+	self.column_= column or 1
+	self.row_= row or 1
+end
+
+function UIPageView:getAllItems()
+	return self.items_
+end
+
 local uiloader = cc.uiloader
 
 -- private
@@ -410,7 +421,7 @@ function UIPushButton:getButtonImage(state)
 end
 
 function UIPushButton:addButtonImageGray( state )
-	local uiManager = app.uiManager
+	local uiManager = _G.GAME_APP:GetUIManager()
 	local filename = self:getButtonImage( state )
 	if filename ~= nil and uiManager ~= nil then
 		uiManager:createGraySpriteFrame( string.sub( filename, 2 ) )
@@ -488,8 +499,12 @@ function UIPushButton:getButtonSize()
 end
 
 function UIPushButton:showButtonGlowEffect( bShow )
+	local uiManager = _G.GAME_APP:GetUIManager()
+	if uiManager == nil then
+		return
+	end
 	if bShow == true then
-		app.uiManager:addButtonGlowEffect( self, self:getButtonSize() )	
+		uiManager:addButtonGlowEffect( self, self:getButtonSize() )	
 	else
 		local nTag = 808080808
 		local childNode = self:getChildByTag(nTag)

@@ -1,11 +1,11 @@
 {
 "types":
-["I","S","S","I","S","B"],
+["I","S","S","I","S","B","I","I","I","I","I","I","I","I","I","I","I","I"],
 "fields":
-["id","name","type","mapId","bg","isReverse"],
+["id","name","type","mapId","bg","isReverse","begin_rot","carNum","car1_oX","car1_oY","car2_oX","car2_oY","car3_oX","car3_oY","car4_oX","car4_oY","car5_oX","car5_oY"],
 "values":
 [
-["20001","正常赛","Free","1002","png/map_bg_1002.png","FALSE"]
-,["20002","反向赛","Free","1001","png/map_bg_1003.jpg","TRUE"]
+["20001","正常赛","Free","1002","png/map_bg_1001.png","FALSE","0","1","790","420","800","430","810","440","800","400","800","400"]
+,["20002","反向赛","Free","1001","png/map_bg_1002.png","FALSE","0","3","842","466","842","361","755","523","755","420","800","400"]
 ]
 }

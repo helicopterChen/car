@@ -267,7 +267,7 @@ function UIManager:CreateUIByNameAsync( uiName, resetData, callback, callbackDat
 		if uiModule.m_tDynItemCacheLoadTable ~= nil then
 			for i, v in ipairs(uiModule.m_tDynItemCacheLoadTable) do
 				if uiModule:IsDynamicItemCacheInited( v[1] ) ~= true then
-					self:addDynamicItemCacheAsync( v[1], v[2], uiModule )
+					self:AddDynamicItemCacheAsync( v[1], v[2], uiModule )
 				end
 			end
 		end
@@ -648,7 +648,7 @@ function UIManager:UpdateLoadDynUIJson()
 			if oCreateQueue ~= nil and oUIModule ~= nil then
 				local tData = oCreateQueue:OutQueue()
 				if tData ~= nil then
-					local oNode, width, height = self:loadUIFromFilePath( unpack(tData) )
+					local oNode, width, height = self:LoadUIFromFilePath( unpack(tData) )
 					if oNode ~= nil and oUIModule ~= nil then
 						oUIModule:AddDynamicItemCacheByName( sFilePath, oNode )
 					end
@@ -821,7 +821,7 @@ end
 
 function UIManager:RegisterEventsHandlers( controlPath, eventName, handler, uiModule )
 	assert( uiModule ~= nil )
-	if eventName ~= "OnClicked" and eventName ~= "OnPressed" and eventName ~= "OnReleased" and eventName ~= "TouchEvent" then
+	if eventName ~= "OnClicked" and eventName ~= "OnPressed" and eventName ~= "OnReleased" and eventName ~= "TouchEvent" and eventName ~= "PageViewEvent" then
 		return
 	end
 	local control = uiModule:SeekNodeByPath( controlPath )
@@ -871,6 +871,13 @@ function UIManager:RegisterEventsHandlers( controlPath, eventName, handler, uiMo
 						end
 						handler( uiModule, event ) 
 						end )
+			end
+		elseif iskindof(control, "UIPageView") then
+			if eventName == "PageViewEvent" then
+				control:onTouch(nil)
+				control:onTouch(function(event)
+									return handler(uiModule,event)
+								end)
 			end
 		elseif iskindof(control, "UIPanel") then --panel控件才会有ontouch这种事件存在
 			if eventName == "TouchEvent" then
@@ -965,7 +972,7 @@ function UIManager.loadTexture(plist, png)
 	local fileUtil
 	fileUtil = cc.FileUtils:getInstance()
 	local fullPath = fileUtil:fullPathForFilename(plist)
-	UIManager.addSearchPathIf(io.pathinfo(fullPath).dirname, fileUtil)
+	UIManager.AddSearchPathIf(io.pathinfo(fullPath).dirname, fileUtil)
 	local spCache
 	spCache = cc.SpriteFrameCache:getInstance()
 	if png then
@@ -983,12 +990,12 @@ function UIManager.isNil(str)
 	end
 end
 
-function UIManager.addSearchPathIf(dir, fileUtil)
+function UIManager.AddSearchPathIf(dir, fileUtil)
 	if not UIManager.searchDirs then
 		UIManager.searchDirs = {}
 	end
 
-	if not UIManager.isSearchExist(dir) then
+	if not UIManager.IsSearchExist(dir) then
 		table.insert(UIManager.searchDirs, dir)
 		if not fileUtil then
 			fileUtil = cc.FileUtils:getInstance()
@@ -997,7 +1004,7 @@ function UIManager.addSearchPathIf(dir, fileUtil)
 	end
 end
 
-function UIManager.isSearchExist(dir)
+function UIManager.IsSearchExist(dir)
 	local bExist = false
 	for i,v in ipairs(UIManager.searchDirs) do
 		if v == dir then
@@ -1027,7 +1034,7 @@ function UIManager:transResName(fileData)
 	end
 end
 
-function UIManager:replaceSpriteIcon( sprite, plistFile, filePath, isGray )
+function UIManager:ReplaceSpriteIcon( sprite, plistFile, filePath, isGray )
 	if sprite == nil then
 		return
 	end
@@ -1064,12 +1071,12 @@ function UIManager:replaceSpriteIcon( sprite, plistFile, filePath, isGray )
 		options.originScaleX = options.scaleX
 		options.originScaleY = options.scaleY
 	end
-	local uiNode = self:createSpriteIcon( options, sprite.jsonNode, isGray )
+	local uiNode = self:CreateSpriteIcon( options, sprite.jsonNode, isGray )
 	if uiNode == nil then
 		return
 	end
 	uiNode.name = options.name or "unknow node"
-	sprite:removeFromParentAndCleanup(true)
+	sprite:removeFromParent(true)
 	parent:addChild(uiNode)
 
 	if options.flipX then
@@ -1092,7 +1099,7 @@ function UIManager:replaceSpriteIcon( sprite, plistFile, filePath, isGray )
 	return uiNode
 end
 
-function UIManager:setSpriteGray( sprite, bIsGray )
+function UIManager:SetSpriteGray( sprite, bIsGray )
 	if sprite == nil then
 		return
 	end
@@ -1101,10 +1108,10 @@ function UIManager:setSpriteGray( sprite, bIsGray )
 	if options == nil or  options.fileNameData == nil or jsonNode == nil then
 		return
 	end
-	self:replaceSpriteIcon( sprite, options.fileNameData.plistFile, options.fileNameData.path, bIsGray )
+	self:ReplaceSpriteIcon( sprite, options.fileNameData.plistFile, options.fileNameData.path, bIsGray )
 end
 
-function UIManager:replaceSpriteIconByName( sprite, sameFilePngName )
+function UIManager:ReplaceSpriteIconByName( sprite, sameFilePngName )
 	if sprite == nil then
 		return
 	end
@@ -1113,10 +1120,10 @@ function UIManager:replaceSpriteIconByName( sprite, sameFilePngName )
 	if options == nil or  options.fileNameData == nil or jsonNode == nil then
 		return
 	end
-	self:replaceSpriteIcon( sprite, options.fileNameData.plistFile, sameFilePngName, false )
+	self:ReplaceSpriteIcon( sprite, options.fileNameData.plistFile, sameFilePngName, false )
 end
 
-function UIManager:createSpriteIcon( options, jsonNode, isGray )
+function UIManager:CreateSpriteIcon( options, jsonNode, isGray )
 	local params = {}
 	params.scale9 = options.scale9Enable
 	if params.scale9 then

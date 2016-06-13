@@ -1,4 +1,5 @@
 local UIGameMission = class("UIGameMission", _G.GAME_BASE.UIBaseClass )
+local TimeUtility = _G.GAME_BASE.TimeUtility
 ---------------------------------------------------------------------------------------------------------
 function UIGameMission:InitConfig()
 	self.m_sJsonFilePath = "ui/gameMission.json"
@@ -16,21 +17,72 @@ function UIGameMission:OnInitEventsHandler()
 	end
 	self:RegisterEventsHandlers( "ref", "TouchEvent", self.OnTouchEvent )
 	self:RegisterEventsHandlers( "ref/backBtn", 	"OnClicked", 	self.OnClickedBackBtn )
-	self:RegisterEventsHandlers( "ref/addBtn", 		"OnClicked", 	self.OnClickedAddBtn )
-	self:RegisterEventsHandlers( "ref/minusBtn", 	"OnClicked", 	self.OnClickedMinusBtn )
+	self:RegisterEventsHandlers( "ref/pauseBtn", 	"OnClicked", 	self.OnClickedPauseBtn )
 end
 
 function UIGameMission:InitData()
 end
 
 function UIGameMission:OnShowUI()
+	local oGameApp = self:GetGameApp()
+	if oGameApp == nil then
+		return
+	end
+	local oRaceLogicManager = oGameApp:GetRaceLogicManager()
+	if oRaceLogicManager == nil then
+		return
+	end
+	self.m_oRaceLogicManager = oRaceLogicManager
+	self.m_oTimeLabel = self:SeekNodeByPath( "ref/timeLabel" )
+	self.m_oTimeLabel:enableOutline(cc.c4b(254,241,217,255),3)	
 end
 
 function UIGameMission:OnCloseUI()
 end
 ---------------------------------------------------------------------------------------------------------
+function UIGameMission:OnUpdateSec( dt )
+	if self.m_nCountDownTime ~= nil then
+		local countDownLabel = self:SeekNodeByPath( "startLayer.FILL_SCREEN/countDownLabel" )
+		if countDownLabel ~= nil then
+			if self.m_nCountDownTime ~= 0 then
+				countDownLabel:setString( math.floor(self.m_nCountDownTime) )
+			else
+				countDownLabel:setString( "Go" )
+			end
+		end
+		if self.m_nCountDownTime < 0 then
+			local startLayer = self:SeekNodeByPath( "startLayer.FILL_SCREEN" )
+			if startLayer ~= nil then
+				startLayer:setVisible(false)
+			end
+			self.m_oRaceLogicManager:RealStartRace()
+		end
+		self.m_nCountDownTime = self.m_nCountDownTime - 1
+	end
+end
+
+function UIGameMission:OnUpdateUI( dt )
+	if self.m_oTimeLabel ~= nil then
+		local oCurRaceLogic = self.m_oRaceLogicManager:GetCurRaceLogic()
+		if oCurRaceLogic ~= nil then
+			if oCurRaceLogic:IsRealStart() == true then
+				local nTotalTimeSec = oCurRaceLogic:GetRaceTotalTime()
+				local sTimeStr = TimeUtility.TransTimeValToStr( math.floor(nTotalTimeSec * 60))
+				self.m_oTimeLabel:setString( sTimeStr )
+			end
+		end
+	end
+end
+
+function UIGameMission:BeginCountDown( nCountDownTime )
+	self.m_nCountDownTime = nCountDownTime
+	local startLayer = self:SeekNodeByPath( "startLayer.FILL_SCREEN" )
+	if startLayer ~= nil then
+		startLayer:setVisible(true)
+	end
+end
+
 function UIGameMission:OnTouchEvent( event )
-	print( "OnTouchEvent", event.name )
 	local oCurScene = _G.GAME_APP:GetCurScene()
 	if oCurScene == nil then
 		return
@@ -69,6 +121,20 @@ function UIGameMission:OnClickedBackBtn()
 	_G.GAME_APP:EnterSceneMainGame()
 end
 
+function UIGameMission:OnClickedPauseBtn()
+	local uiManager = self:GetUIManager()
+	local oGameApp = self:GetGameApp()
+    if oGameApp == nil or uiManager == nil then
+        return
+    end
+    local oRaceLogicManager = oGameApp:GetRaceLogicManager()
+    if oRaceLogicManager == nil then
+    	return
+    end
+    oRaceLogicManager:SetPauseRace(not oRaceLogicManager:IsPauseUpdate())
+    uiManager:ShowUI( "UIPausePanel", true )
+end
+
 function UIGameMission:OnClickedAddBtn()
 	local oGameApp = self:GetGameApp()
     if oGameApp == nil then
@@ -81,7 +147,7 @@ function UIGameMission:OnClickedAddBtn()
     local tCars = oObjectManager:GetObjectsByType( "CGameCar" )
     if tCars ~= nil then
         for i, v in pairs( tCars ) do
-        	v:SetVelocity( 500, 0 )
+        	v:SetVelocity( 800, 0 )
         end
     end
 end

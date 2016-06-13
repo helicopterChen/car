@@ -7,8 +7,9 @@ function UIDebugInfoPanel:InitConfig()
 end
 
 function UIDebugInfoPanel:OnInitEventsHandler()
-	self:RegisterEventsHandlers( "ref/debugSwitchBtn", 	  		"OnClicked", 	self.OnClickedDebugSwitchBtn )
-	self:RegisterEventsHandlers( "ref/showDebugInfoBtn", 	  	"OnClicked", 	self.OnClickedShowDebugInfoBtn )
+	self:RegisterEventsHandlers( "ref/debugSwitchBtn", 	  				"OnClicked", 	self.OnClickedDebugSwitchBtn )
+	self:RegisterEventsHandlers( "ref/funcPanel/showDebugInfoBtn", 	  	"OnClicked", 	self.OnClickedShowDebugInfoBtn )
+	self:RegisterEventsHandlers( "ref/funcPanel/clearBtn", 				"OnClicked", 	self.OnClickedClearBtn )
 end
 
 function UIDebugInfoPanel:InitData()
@@ -50,6 +51,7 @@ function UIDebugInfoPanel:OnClickedShowDebugInfoBtn()
 	if oInfoListView == nil then
 		return
 	end
+	oInfoListView:removeAllItems()
 	for i, v in ipairs( _G.__LOG_STR_MAP_ ) do
 		local infoLabel = cc.LabelTTF:create( v, "", 20, cc.size( 950, 0 ), cc.ui.TEXT_ALIGN_LEFT )
 		local oNewItem = oInfoListView:newItem( infoLabel );
@@ -63,5 +65,15 @@ function UIDebugInfoPanel:OnClickedShowDebugInfoBtn()
 	end
 	oInfoListView:reload()
 end
+
+function UIDebugInfoPanel:OnClickedClearBtn()
+	local oInfoListView = self:SeekNodeByPath( "ref/funcPanel/infoPanel/infoListView" )
+	if oInfoListView == nil then
+		return
+	end
+	oInfoListView:removeAllItems()
+	oInfoListView:reload()
+end
+
 
 return UIDebugInfoPanel

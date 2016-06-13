@@ -4,7 +4,8 @@ function cObjectManager:ctor()
 	self.m_tGameObjects = {}
 	self.m_tTypeObjectMap = {}
 	self.m_tObjectClassMap = {}
-	self.m_nNewObjectId = 100000000
+	self.m_nNewObjectId = 100000001
+	self.m_bPauseUpdate = false
 end
 
 function cObjectManager:GetInstance()
@@ -104,15 +105,20 @@ function cObjectManager:CreateObjectByType( sType, tConf )
 			self:RegisterGameObject( oGameObject )
 			oGameObject:ClearAllContainers()
 			oGameObject:OnInitContainers()	
+			oGameObject.m_bInited = true
+			oGameObject:OnInitOk()
 			return oGameObject
 		end
 	end
 end
 
 function cObjectManager:Update( nTimeDelta )
+	if self.m_bPauseUpdate == true then
+		return
+	end
 	local tNeedDeleteObjects = {}
 	for i, v in pairs( self.m_tGameObjects ) do
-		if v.m_bNeedDelete ~= true then
+		if v.m_bNeedDelete ~= true and v.m_bInited == true then
 			if v.DefaultUpdate ~= nil then
 				v:DefaultUpdate( nTimeDelta )
 			end
@@ -127,6 +133,10 @@ function cObjectManager:Update( nTimeDelta )
 	for i, v in ipairs( tNeedDeleteObjects ) do
 		self:RemoveObject( v )
 	end
+end
+
+function cObjectManager:SetPauseUpdate( bPause )
+	self.m_bPauseUpdate = bPause
 end
 
 return cObjectManager
